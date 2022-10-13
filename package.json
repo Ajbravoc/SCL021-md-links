@@ -2,10 +2,13 @@
   "name": "md-links",
   "version": "0.1.0",
   "main": "./src/index.js",
-  "bin" : {
+  "bin": {
     "mdscan": "./src/mdLinks.js"
   },
   "engines": {
     "node": ">=16.x"
+  },
+  "dependencies": {
+    "colors": "^1.4.0"
   }
 }

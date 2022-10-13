@@ -6,6 +6,15 @@ const { extname } = require('path');
 const userRoute = process.argv[2]; //node documento.js laruta.com
                                     //[0]    [1]          [2]
 const formatOk = ".md";
+let colors = require ('colors');
+
+
+let expReg = /(https?:\/\/)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/gi
+
+
+
+
+/*------------------------------------------------------------------------------------ */
 
 // Lectura de ruta (Transforma la ruta relativa a absoluta)
 
@@ -22,11 +31,11 @@ console.log("De ruta relativa a ruta absoluta: " + path.resolve(userRoute))
 /*------------------------------------------------------------------------------------ */
 
 // Verifica si el archivo es un archivo 
+
   let stats = fs.statSync(userRoute);
 console.log("¿La ruta corresponde a un archivo? " + stats.isFile());
 
 /*------------------------------------------------------------------------------------ */
-
 
 //Obtener formato de archivo 
 let filename = userRoute; 
@@ -38,10 +47,9 @@ if (extension === formatOk){
 
     let arr = filename.split(",");
     console.log (arr); //Ruta en un array
-    
 }
 else { 
-    console.log("Archivo inválido");
+    console.log("Archivo inválido".rainbow);
 }
 
 
@@ -50,42 +58,17 @@ cadena.substring(indiceA[, indiceB'])
 indexOf: Método que devuelve la posición en la cadena de la primera ocurrencia del valor
 /*------------------------------------------------------------------------------------ */
 
-//Lectura del archivo
+//Lectura del archivo, links.
 // Método accede a un fichero para su lectura 
 
+const links = [];
 fs.readFile(userRoute, 'utf-8', (err, data) => {
     if(err) {
       console.log('error: ', err);
     } else {
-      console.log(data);
+      console.log(data.match(expReg));
     }
   });
 
 
-// Lectura de documentos
-const searchURL = (userRoute) => {
-    return new Promise((resolve, reject) => {
-        const linksData = [];
-          fs.readFile(source, 'utf8', (err, data) => {
-            if(err) {
-                reject(err)
-            } else if (data.match(url) === null) {
-                reject(`
----------------------------------------------------` +
-`
-${path.parse(userRoute).base}: No hay links en este documento :(` +
-
-`
----------------------------------------------------`)
-            } else if (data) {
-                data.match(url).forEach(link => {
-                linksData.push(link)
-                })
-            resolve(linksData) 
-            }
-        })
-    })
-}
-
 /*------------------------------------------------------------------------------------ */
-
