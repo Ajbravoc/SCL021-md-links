@@ -4,7 +4,7 @@ let fs = require("fs"); /*En NodeJS todas las operaciones de acceso al sistema d
 Si queremos leer un archivo de texto que tenemos en local simplemete usaremos ese módulo para extraer el contenido del fichero, indicando su ruta y otra serie de parámetros.*/
 
 const userRoute = process.argv[2]; //node documento.js laruta.com
-//[0]    [1]          [2]
+                                     //[0]    [1]          [2]
 /*Interfaz de programación de aplicaciones incorporada del módulo de proceso que se utiliza para pasar los argumentos al proceso node.js 
 cuando se ejecuta en la línea de comandos.*/
 /*This property returns an array containing the arguments passed to the process when run it in the command line*/
@@ -32,7 +32,9 @@ const getAbsoluteLink = () => {
   }
   return getAbsoluteLink;
 };
-console.log("De ruta relativa a ruta absoluta: ".bgWhite + path.resolve(userRoute));
+console.log(
+  "De ruta relativa a ruta absoluta: ".bgWhite + path.resolve(userRoute)
+);
 
 /*------------------------------------------------------------------------------------ */
 
@@ -49,7 +51,7 @@ if (ext === formatOk) {
   let linksArray = filename.split(); //Método split sin parámetro para obtener el mismo string pero en array
   console.log(linksArray);
 } else {
-  console.log("Archivo inválido".rainbow);
+  console.log("Extensión de archivo inválido".rainbow);
 }
 
 /* Subtring method devuelve un subconjunto de un objeto string cadena.substring(indiceA[,indiceB'])
@@ -61,7 +63,8 @@ function readLinks() {
   return new Promise((resolve, reject) => {
     //Con la nueva promesa mencionamos como vamos a leer los links
     let dataMatch = []; //Podemos dejar esto acá para que sea parte de la función?
-    fs.readFile(userRoute, "utf-8", (error, data) => { //la data alude a la data que se encuentra dentro de archivo tipeado por el user(userRoute)
+    fs.readFile(userRoute, "utf-8", (error, data) => {
+      //la data alude a la data que se encuentra dentro de archivo tipeado por el user(userRoute)
       if (data) {
         dataMatch = data.match(expresionRegular); //Método match retorna un array con los match de un objeto/string
         console.log(
@@ -95,17 +98,19 @@ const uniqueLinks = (infoLinks) => {
 
 //Consume la promesa y callback para validar/mostrar status de los links de los uniqueLinks
 readLinks() //Usamos aquí un callback porque llamamos a otra función que ya fue creada y la pasamos como argumento
-  .then((result) => { //Lo que yo espero que la promesa me retorne
+  .then((result) => {
+    //Lo que yo espero que la promesa me retorne
     console.log(result);
     uniqueLinks(result);
 
-/*------------------------------------------------------------------------------------ */
-//  Validar links encontrados con petición HTTP (True)
+    /*------------------------------------------------------------------------------------ */
+    //  Validar links encontrados con petición HTTP (True)
 
     const validLinksWithPetition = (dataMatch) => {
-      return dataMatch.map((link) => { //Map: Itera a través de los elementos dentro de una colección de arrays
+      return dataMatch.map((link) => { //link: Acá estan los url del match 
+        //Map: Itera a través de los elementos dentro de una colección de arrays
         return new Promise((resolve, reject) => {
-          https.get(link, (res) => {
+          https.get(link, (res) => { //https.get = método de http node que permite saber el status del link 
             if (res.statusCode === 200) {
               resolve({
                 RouteText: process.argv[2],
@@ -126,7 +131,7 @@ readLinks() //Usamos aquí un callback porque llamamos a otra función que ya fu
       });
     };
 
-/*------------------------------------------------------------------------------------ */
+    /*------------------------------------------------------------------------------------ */
     // Muestra el estado de los links encontrados con petición HTTP
     const linkPromises = validLinksWithPetition(result);
     //console.log(validLinks(result));
