@@ -1,121 +1,147 @@
-#!/usr/bin/env node
+const path = require("path"); //Provides utilities for working with file and directory paths//
 
-const path = require('path');
-let fs = require('fs'); /*En NodeJS todas las operaciones de acceso al 
-sistema de archivos están englobadas dentro del módulo "fs" (File System).
- Si queremos leer un archivo de texto que tenemos en local simplemte 
- usaremos ese módulo para extraer el contenido del fichero, indicando 
- su ruta y otra serie de parámetros que ahora describiremos.*/
+let fs = require("fs"); /*En NodeJS todas las operaciones de acceso al sistema de archivos están englobadas dentro del módulo "fs" (File System).
+Si queremos leer un archivo de texto que tenemos en local simplemete usaremos ese módulo para extraer el contenido del fichero, indicando su ruta y otra serie de parámetros.*/
+
 const userRoute = process.argv[2]; //node documento.js laruta.com
-                                    //[0]    [1]          [2]
+//[0]    [1]          [2]
+/*Interfaz de programación de aplicaciones incorporada del módulo de proceso que se utiliza para pasar los argumentos al proceso node.js 
+cuando se ejecuta en la línea de comandos.*/
+/*This property returns an array containing the arguments passed to the process when run it in the command line*/
+
+//Módulo: “El módulo divide la base de código en pequeñas unidades, que se pueden usar en cualquier parte de la aplicación”
+
 const formatOk = ".md";
-let colors = require ('colors');
-let expReg = /(https?:\/\/)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/gi;
-const https = require ("https");
+//test ('formato -> .md', () => {
+//  expect(formatOk.toBe(".md"));
+//} );
+
+let colors = require("colors"); //Dependencia
+let expresionRegular =
+  /(https?:\/\/)(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()!@:%_\+.~#?&\/\/=]*)/gi;
+const https = require("https"); //La función require hace una solicitud HTTPS
+
 /*------------------------------------------------------------------------------------ */
 
 // Lectura de ruta (Transforma la ruta relativa a absoluta)
 
 const getAbsoluteLink = () => {
-    if(path.isAbsolute(userRoute) === false){
-        return path.resolve(userRoute)
-        //lo entrega, con console.log se puede comprobar
-    } 
-    return getAbsoluteLink;
-}
-console.log("De ruta relativa a ruta absoluta: " + path.resolve(userRoute))
-
-
-/*------------------------------------------------------------------------------------ */
-
-// Verifica si el archivo es un archivo 
-
-  let stats = fs.statSync(userRoute);
-console.log("¿La ruta corresponde a un archivo? " + stats.isFile());
+  if (path.isAbsolute(userRoute) === false) {
+    return path.resolve(userRoute);
+    //lo entrega, con console.log se puede comprobar
+  }
+  return getAbsoluteLink;
+};
+console.log("De ruta relativa a ruta absoluta: " + path.resolve(userRoute));
 
 /*------------------------------------------------------------------------------------ */
 
-//Obtener formato de archivo 
-let filename = userRoute; 
-let ext = filename.substring(filename.indexOf('.'));
+//Obtener formato de archivo
 
-let extension = ext
-if (extension === formatOk){
-    console.log( "La extensión del archivo es .md?".rainbow  + (extension === formatOk))
+let filename = userRoute;
+let ext = filename.substring(filename.indexOf("."));
 
-    let arr = filename.split(",");
-    console.log (arr); //Ruta en un array
+if (ext === formatOk) {
+  console.log("La extensión del archivo es .md? ".rainbow + (ext === formatOk));
+
+  //Convertir la ruta ingresada en la terminal un array
+
+  let linksArray = filename.split(); //Método split sin parámetro para obtener el mismo string pero en array
+  console.log(linksArray);
+} else {
+  console.log("Archivo inválido".rainbow);
 }
-else { 
-    console.log("Archivo inválido".rainbow);
-}
 
-/* Subtring method devuelve un subconjunto de un objeto string
-cadena.substring(indiceA[, indiceB'])
+/* Subtring method devuelve un subconjunto de un objeto string cadena.substring(indiceA[,indiceB'])
 indexOf: Método que devuelve la posición en la cadena de la primera ocurrencia del valor
+/*------------------------------------------------------------------------------------ */
+//Muestra links y cantidad de links encontrados en total
+
+function readLinks() {
+  return new Promise((resolve, reject) => {
+    //Con la nueva promesa mencionamos como vamos a leer los links
+    let dataMatch = []; //Podemos dejar esto acá para que sea parte de la función?
+    fs.readFile(userRoute, "utf-8", (error, data) => { //la data alude a la data que se encuentra dentro de archivo tipeado por el user(userRoute)
+      if (data) {
+        dataMatch = data.match(expresionRegular); //Método match retorna un array con los match de un objeto/string
+        console.log(
+          "El total de links encontrados es: ".bgYellow,
+          dataMatch.length //Muestra la cantidad de links
+        );
+        resolve(data.match(expresionRegular)); //Muestra todos los links
+      } else {
+        reject(console.log("No hay links en este archivo".bgRed));
+      }
+    });
+  });
+}
+//Acá hay callback? pq un callback supuestamente llama como argumento a otra función
+//Promesas ayudan a simplicar los callbacks
 
 /*------------------------------------------------------------------------------------ */
-
-//Lectura del archivo, links CON PROMESASSSSSS
-/* Método accede a un fichero para su lectura */
-
-
-//resolve y reject desde donde comienzo 
-//then catch como continuará
-//ESTE SI FUNCIONA (Muestra links y cantidad de links)
-function readLinks (){
-    return new Promise ((resolve, reject) => {
-       let count = [];      
-              fs.readFile(userRoute, 'utf-8', (err, data) => {
-         if(err) {
-      //console.log('error: ', err);
-      reject (err);
-       } else {
-      count = data.match(expReg);
-      console.log('El total de links encontrados es: '.bgYellow, count.length);
-      resolve (data.match(expReg));
-    }
-  }); 
-  })
-}
-//hay que pasarla en el then de readlinks, pq ese es el caso de exito al revisar links
+//Identificar links únicos No se como se conectan lo entiendo bien =( )
+// link vendria siendo el link, pero como lo reconoce?
 const uniqueLinks = (infoLinks) => {
   let unique = 0;
   infoLinks.forEach((link, index) => {
-      if(infoLinks.indexOf(link) === index) {
-          unique++
-      }
-  }) 
-  return console.log('El total de links únicos encontrados es: '.bgMagenta, unique);
-};
-//Validar promesa True
-const validLinksWithPetition = (count) => {
-     return count.map(link => {
-        return new Promise((resolve, reject) => {
-            https.get(link, res => {
-                if(res.statusCode === 200) {
-                    resolve({count: process.argv[2], url: link, code: res.statusCode, message: "OK"})
-                } else {
-                  reject({count: process.argv[2], url: link, code: res.statusCode, message: "FAIL"})
-                }
-              })
-        })
-    })
+    if (infoLinks.indexOf(link) === index) {
+      unique++;
+    }
+  });
+  return console.log(
+    "El total de links únicos encontrados es: ".bgMagenta,
+    unique
+  );
 };
 
-readLinks()
-  .then((result) => {
+//Consolidamos la promesa y callback para validar/mostrar status de los links de los uniqueLinks
+readLinks() //Callback porque llamamos a otra función que ya fue creada y la pasamos como argumento
+  .then((result) => { //lo que yo espero que la promesa me retorne
     console.log(result);
-    uniqueLinks(result); //llamamos la funcion de abajo
+    uniqueLinks(result);
+
+    /*------------------------------------------------------------------------------------ */
+    //  Validar links encontrados con petición HTTP (True)
+
+    const validLinksWithPetition = (dataMatch) => {
+      return dataMatch.map((link) => {
+        return new Promise((resolve, reject) => {
+          https.get(link, (res) => {
+            if (res.statusCode === 200) {
+              resolve({
+                RouteText: process.argv[2],
+                FileUrl: link,
+                Code: res.statusCode,
+                Message: "OK",
+              });
+            } else {
+              reject({
+                RouteText: process.argv[2],
+                FileUrl: link,
+                Code: res.statusCode,
+                Message: "FAIL",
+              });
+            }
+          });
+        });
+      });
+    };
+
+    // Muestra el estado de los links encontrados con petición HTTP
     const linkPromises = validLinksWithPetition(result);
     //console.log(validLinks(result));
 
-    return Promise.allSettled(linkPromises);
+    //Se describe el resultado de cada promesa
+    return Promise.allSettled(linkPromises); //Pasamos como parámetro una constante y Mostramos el status a través de un array
   })
   .then((resPromises) => {
-    console.log('Verificando el estado de los links:'.red)
+    console.log(" Estado de los links: ".red);
     console.log(resPromises);
   })
   .catch((error) => {
     console.log(error);
   });
+
+/* El método promise.allSettled() devuelve una promesa que es resuelta después de que todas las promesas dadas hayan
+   sido concluidas, sin importar si fueron resueltas o rechazadas. El resultado va a ser una serie de objetos describiendo
+    el resultado de cada promesa*/

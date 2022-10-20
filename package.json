@@ -5,11 +5,14 @@
   "bin": {
     "mdscan": "./src/mdLinks.js"
   },
+  "scripts": {
+    "test": "jest"
+  },
   "engines": {
     "node": ">=16.x"
   },
   "dependencies": {
-    "colors": "^1.4.0"
-  
+    "colors": "^1.4.0",
+    "jest": "^29.2.1"
   }
 }
