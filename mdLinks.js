@@ -32,7 +32,7 @@ const getAbsoluteLink = () => {
   }
   return getAbsoluteLink;
 };
-console.log("De ruta relativa a ruta absoluta: " + path.resolve(userRoute));
+console.log("De ruta relativa a ruta absoluta: ".bgWhite + path.resolve(userRoute));
 
 /*------------------------------------------------------------------------------------ */
 
@@ -75,12 +75,11 @@ function readLinks() {
     });
   });
 }
-//Acá hay callback? pq un callback supuestamente llama como argumento a otra función
-//Promesas ayudan a simplicar los callbacks
 
 /*------------------------------------------------------------------------------------ */
-//Identificar links únicos No se como se conectan lo entiendo bien =( )
-// link vendria siendo el link, pero como lo reconoce?
+
+//Links únicos
+
 const uniqueLinks = (infoLinks) => {
   let unique = 0;
   infoLinks.forEach((link, index) => {
@@ -94,17 +93,17 @@ const uniqueLinks = (infoLinks) => {
   );
 };
 
-//Consolidamos la promesa y callback para validar/mostrar status de los links de los uniqueLinks
-readLinks() //Callback porque llamamos a otra función que ya fue creada y la pasamos como argumento
-  .then((result) => { //lo que yo espero que la promesa me retorne
+//Consume la promesa y callback para validar/mostrar status de los links de los uniqueLinks
+readLinks() //Usamos aquí un callback porque llamamos a otra función que ya fue creada y la pasamos como argumento
+  .then((result) => { //Lo que yo espero que la promesa me retorne
     console.log(result);
     uniqueLinks(result);
 
-    /*------------------------------------------------------------------------------------ */
-    //  Validar links encontrados con petición HTTP (True)
+/*------------------------------------------------------------------------------------ */
+//  Validar links encontrados con petición HTTP (True)
 
     const validLinksWithPetition = (dataMatch) => {
-      return dataMatch.map((link) => {
+      return dataMatch.map((link) => { //Map: Itera a través de los elementos dentro de una colección de arrays
         return new Promise((resolve, reject) => {
           https.get(link, (res) => {
             if (res.statusCode === 200) {
@@ -127,6 +126,7 @@ readLinks() //Callback porque llamamos a otra función que ya fue creada y la pa
       });
     };
 
+/*------------------------------------------------------------------------------------ */
     // Muestra el estado de los links encontrados con petición HTTP
     const linkPromises = validLinksWithPetition(result);
     //console.log(validLinks(result));
